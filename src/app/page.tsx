@@ -1,7 +1,12 @@
 export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <h1>Eai meu chapa</h1>
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4">Sistema de gerenciamento de usuários</h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Bem vindo ao gerenciamento de usuários
+        </p>
+      </div>
     </div>
   );
 }
