@@ -23,10 +23,21 @@ interface RegisterResponse {
   };
 }
 
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  zipCode?: string;
+  bairro?: string;
+  city?: string;
+  state?: string;
+}
+
 interface ApiContextType {
   registerUser: (
     data: Omit<SignUpData, "confirmPassword">
   ) => Promise<RegisterResponse>;
+  getUserData: () => Promise<UserData>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -61,9 +72,18 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
     return result;
   };
 
+  const getUserData = async (): Promise<UserData> => {
+    const response = await fetch("/api/user/me");
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to fetch user data");
+    }
+    return response.json();
+  };
+
   return (
     <SessionProvider>
-      <ApiContext.Provider value={{ registerUser }}>
+      <ApiContext.Provider value={{ registerUser, getUserData }}>
         {children}
       </ApiContext.Provider>
     </SessionProvider>

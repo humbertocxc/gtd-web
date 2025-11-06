@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import { Button } from "@/components/ui/button";
 
 const LoginForm = dynamic(() => import("@/components/LoginForm"), {
   ssr: false,
@@ -15,6 +18,27 @@ const SignUpForm = dynamic(() => import("@/components/SignUpForm"), {
 
 export default function Home() {
   const [mode, setMode] = useState<"login" | "signup">("login");
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      router.push("/dashboard");
+    }
+  }, [session, status, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Verificando sessão...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -24,26 +48,26 @@ export default function Home() {
             Sistema de gerenciamento de usuários
           </h1>
           <div className="flex justify-center space-x-4 mb-6">
-            <button
+            <Button
               onClick={() => setMode("login")}
               className={`px-6 py-2 rounded-md font-medium transition-colors ${
                 mode === "login"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  ? "bg-blue-800 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-900 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               }`}
             >
               Login
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setMode("signup")}
               className={`px-6 py-2 rounded-md font-medium transition-colors ${
                 mode === "signup"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  ? "bg-blue-800 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-900 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               }`}
             >
               Cadastrar
-            </button>
+            </Button>
           </div>
         </div>
         {mode === "login" ? <LoginForm /> : <SignUpForm />}

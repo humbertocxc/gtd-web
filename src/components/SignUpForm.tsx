@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 import { AddressData } from "@/lib/services/address/cep-service";
 import { CepField } from "./CepField";
 import { useApi } from "@/context/ApiProvider";
@@ -86,7 +87,10 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormLabel>Senha</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Sua senha" {...field} />
+                    <PasswordInput
+                      placeholder="Sua senha"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -99,8 +103,7 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormLabel>Confirmar Senha</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
+                    <PasswordInput
                       placeholder="Confirme sua senha"
                       {...field}
                     />
@@ -156,7 +159,10 @@ export default function SignUpForm() {
             />
           </div>
           <div className="col-span-full mt-4">
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full bg-gray-900 text-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            >
               Cadastrar
             </Button>
           </div>
