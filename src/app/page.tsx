@@ -23,7 +23,16 @@ export default function Home() {
 
   useEffect(() => {
     if (status === "authenticated" && session) {
-      router.push("/dashboard");
+      const userId =
+        session.user?.id ??
+        (typeof window !== "undefined" && localStorage.getItem("user")
+          ? JSON.parse(localStorage.getItem("user") as string)?.id
+          : null);
+      if (userId) {
+        router.push(`/${userId}`);
+      } else {
+        router.push("/dashboard");
+      }
     }
   }, [session, status, router]);
 

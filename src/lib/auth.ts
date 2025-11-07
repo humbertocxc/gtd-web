@@ -21,9 +21,15 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email },
-        });
+        let user;
+        try {
+          user = await prisma.user.findUnique({
+            where: { email },
+          });
+        } catch (error) {
+          console.error("Database query failed:", error);
+          throw new Error("Internal server error. Please try again later.");
+        }
 
         if (!user) {
           return null;

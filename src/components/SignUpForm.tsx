@@ -19,6 +19,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { AddressData } from "@/lib/services/address/cep-service";
 import { CepField } from "./CepField";
 import { useApi } from "@/context/ApiProvider";
+import { useRouter } from "next/navigation";
 
 export default function SignUpForm() {
   const form = useForm({
@@ -27,6 +28,7 @@ export default function SignUpForm() {
   });
 
   const { registerUser } = useApi();
+  const router = useRouter();
 
   const handleAddressFetched = (addressData: AddressData | null) => {
     if (addressData) {
@@ -40,6 +42,13 @@ export default function SignUpForm() {
     try {
       const result = await registerUser(data);
       console.log("User registered successfully:", result);
+      const user = result?.user;
+      if (user) {
+        try {
+          localStorage.setItem("user", JSON.stringify(user));
+        } catch {}
+        router.push(`/${user.id}`);
+      }
     } catch (error) {
       console.error("Registration failed:", error);
     }
@@ -87,10 +96,7 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormLabel>Senha</FormLabel>
                   <FormControl>
-                    <PasswordInput
-                      placeholder="Sua senha"
-                      {...field}
-                    />
+                    <PasswordInput placeholder="Sua senha" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

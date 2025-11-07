@@ -69,6 +69,18 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
       redirect: false,
     });
 
+    try {
+      const meResp = await fetch("/api/user/me");
+      if (meResp.ok) {
+        const me = await meResp.json();
+        try {
+          localStorage.setItem("user", JSON.stringify(me));
+        } catch {}
+      }
+    } catch {
+      console.log("ops");
+    }
+
     return result;
   };
 

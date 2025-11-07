@@ -40,6 +40,19 @@ export default function LoginForm() {
         console.error("Login failed:", result.error);
       } else {
         console.log("Login successful");
+        try {
+          const resp = await fetch("/api/user/me");
+          if (resp.ok) {
+            const me = await resp.json();
+            try {
+              localStorage.setItem("user", JSON.stringify(me));
+            } catch {}
+            router.push(`/${me.id}`);
+            return;
+          }
+        } catch (err) {
+          console.error("Failed to fetch user after login:", err);
+        }
         router.push("/dashboard");
       }
     } catch (error) {
