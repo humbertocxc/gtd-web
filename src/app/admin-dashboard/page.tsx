@@ -12,7 +12,15 @@ import { UserTable } from "@/components/admin/UserTable";
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { users, loading, fetchUsers, deleteUser, updateUser } = useUsers();
+  const {
+    users,
+    loading,
+    fetchUsers,
+    deleteUser,
+    updateUser,
+    isUpdating,
+    isDeleting,
+  } = useUsers();
   const { editingId, editName, setEditName, startEdit, cancelEdit } =
     useUserEdit();
   const {
@@ -75,6 +83,8 @@ export default function AdminDashboard() {
         onSaveEdit={handleSaveEdit}
         onCancelEdit={cancelEdit}
         onDelete={deleteUser}
+        isUpdating={isUpdating}
+        isDeleting={isDeleting}
       />
 
       {filteredUsers.length === 0 && !loading && (

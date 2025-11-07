@@ -75,6 +75,7 @@ export default function LoginForm() {
           />
           <Button
             type="submit"
+            disabled={form.formState.isSubmitting}
             className="w-full bg-gray-900 text-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
           >
             Entrar

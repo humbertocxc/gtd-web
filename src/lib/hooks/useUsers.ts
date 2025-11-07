@@ -10,6 +10,8 @@ interface User {
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -28,6 +30,7 @@ export function useUsers() {
   }, []);
 
   const deleteUser = async (id: string) => {
+    setIsDeleting(true);
     try {
       const response = await fetch(`/api/users/${id}`, {
         method: "DELETE",
@@ -39,10 +42,13 @@ export function useUsers() {
       }
     } catch (error) {
       console.error("Error deleting user:", error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   const updateUser = async (id: string, name: string) => {
+    setIsUpdating(true);
     try {
       const response = await fetch(`/api/users/${id}`, {
         method: "PUT",
@@ -61,6 +67,8 @@ export function useUsers() {
       }
     } catch (error) {
       console.error("Error updating user:", error);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -70,5 +78,7 @@ export function useUsers() {
     fetchUsers,
     deleteUser,
     updateUser,
+    isUpdating,
+    isDeleting,
   };
 }

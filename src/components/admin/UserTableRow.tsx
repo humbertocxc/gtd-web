@@ -30,6 +30,8 @@ interface UserTableRowProps {
   onSaveEdit: () => void;
   onCancelEdit: () => void;
   onDelete: (id: string) => void;
+  isUpdating: boolean;
+  isDeleting: boolean;
 }
 
 export function UserTableRow({
@@ -41,6 +43,8 @@ export function UserTableRow({
   onSaveEdit,
   onCancelEdit,
   onDelete,
+  isUpdating,
+  isDeleting,
 }: UserTableRowProps) {
   return (
     <TableRow>
@@ -52,10 +56,15 @@ export function UserTableRow({
               onChange={(e) => onEditNameChange(e.target.value)}
               className="w-32"
             />
-            <Button size="sm" onClick={onSaveEdit}>
+            <Button size="sm" onClick={onSaveEdit} disabled={isUpdating}>
               Salvar
             </Button>
-            <Button size="sm" variant="outline" onClick={onCancelEdit}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onCancelEdit}
+              disabled={isUpdating}
+            >
               Cancelar
             </Button>
           </div>
@@ -71,13 +80,13 @@ export function UserTableRow({
             size="sm"
             variant="outline"
             onClick={() => onStartEdit(user.id, user.name)}
-            disabled={isEditing}
+            disabled={isEditing || isUpdating || isDeleting}
           >
             <Pencil className="h-4 w-4" />
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button size="sm" variant="destructive">
+              <Button size="sm" variant="destructive" disabled={isDeleting}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>

@@ -21,6 +21,8 @@ interface UserTableProps {
   onSaveEdit: () => void;
   onCancelEdit: () => void;
   onDelete: (id: string) => void;
+  isUpdating: boolean;
+  isDeleting: boolean;
 }
 
 export function UserTable({
@@ -35,6 +37,8 @@ export function UserTable({
   onSaveEdit,
   onCancelEdit,
   onDelete,
+  isUpdating,
+  isDeleting,
 }: UserTableProps) {
   return (
     <Table>
@@ -55,6 +59,8 @@ export function UserTable({
             onSaveEdit={onSaveEdit}
             onCancelEdit={onCancelEdit}
             onDelete={onDelete}
+            isUpdating={isUpdating}
+            isDeleting={isDeleting}
           />
         ))}
       </TableBody>
