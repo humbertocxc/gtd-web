@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const form = useForm({
@@ -27,33 +26,16 @@ export default function LoginForm() {
     },
   });
 
-  const router = useRouter();
-
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     try {
       const result = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: "/",
       });
       if (result?.error) {
         console.error("Login failed:", result.error);
-      } else {
-        console.log("Login successful");
-        try {
-          const resp = await fetch("/api/user/me");
-          if (resp.ok) {
-            const me = await resp.json();
-            try {
-              localStorage.setItem("user", JSON.stringify(me));
-            } catch {}
-            router.push(`/${me.id}`);
-            return;
-          }
-        } catch (err) {
-          console.error("Failed to fetch user after login:", err);
-        }
-        router.push("/dashboard");
       }
     } catch (error) {
       console.error("Login failed:", error);

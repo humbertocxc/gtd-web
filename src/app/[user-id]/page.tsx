@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useApi } from "@/context/ApiProvider";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface UserData {
   id: string;
@@ -27,7 +28,7 @@ export default function DashboardPage() {
     if (status === "loading") return;
 
     if (!session) {
-      router.push("/");
+      router.push("/login");
       return;
     }
 
@@ -55,6 +56,16 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold mb-4">
             Bem-vindo, {userData.name}!
           </h1>
+          {session!.user.role === "ADMIN" && (
+            <div className="mb-4">
+              <Button
+                onClick={() => router.push("/admin-dashboard")}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Admin Dashboard
+              </Button>
+            </div>
+          )}
           <div className="space-y-2">
             <p>
               <strong>Email:</strong> {userData.email}

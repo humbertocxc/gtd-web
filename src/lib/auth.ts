@@ -1,5 +1,6 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { getServerSession } from "next-auth/next";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -25,6 +26,13 @@ export const authOptions: NextAuthOptions = {
         try {
           user = await prisma.user.findUnique({
             where: { email },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              role: true,
+              password: true,
+            },
           });
         } catch (error) {
           console.error("Database query failed:", error);
@@ -45,6 +53,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
+          role: user.role,
         };
       },
     }),
@@ -59,12 +68,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     },
@@ -75,3 +86,14 @@ export const authOptions: NextAuthOptions = {
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
+
+export async function requireAdmin() {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "ADMIN") {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+  return null;
+}

@@ -47,7 +47,7 @@ export default function SignUpForm() {
         try {
           localStorage.setItem("user", JSON.stringify(user));
         } catch {}
-        router.push(`/${user.id}`);
+        router.push("/");
       }
     } catch (error) {
       console.error("Registration failed:", error);

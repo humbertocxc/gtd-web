@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/context/ThemeProvider";
-import { ApiProvider } from "@/context/ApiProvider";
+import { Providers } from "@/components/Providers";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LogoutButton } from "@/components/LogoutButton";
 
@@ -31,15 +30,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
-          <ApiProvider>
-            <div className="fixed top-4 right-4 z-50 flex gap-2">
-              <LogoutButton />
-              <ThemeToggle />
-            </div>
-            {children}
-          </ApiProvider>
-        </ThemeProvider>
+        <Providers>
+          <div className="fixed top-4 right-4 z-50 flex gap-2">
+            <LogoutButton />
+            <ThemeToggle />
+          </div>
+          {children}
+        </Providers>
       </body>
     </html>
   );

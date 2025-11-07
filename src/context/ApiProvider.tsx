@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, ReactNode } from "react";
-import { SessionProvider, signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 interface SignUpData {
   name: string;
@@ -94,10 +94,8 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <SessionProvider>
-      <ApiContext.Provider value={{ registerUser, getUserData }}>
-        {children}
-      </ApiContext.Provider>
-    </SessionProvider>
+    <ApiContext.Provider value={{ registerUser, getUserData }}>
+      {children}
+    </ApiContext.Provider>
   );
 };
