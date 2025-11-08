@@ -30,12 +30,25 @@ NEXTAUTH_SECRET="sua-chave-secreta-aqui"
 
 #### 3. Configurar Banco de Dados
 
+**Opção A: Usando o Script Automatizado (Recomendado)**
 ```bash
 # Tornar o script executável
 chmod +x setup-db.sh
 
 # Executar configuração do banco
 ./setup-db.sh
+```
+
+**Opção B: Configuração Manual**
+```bash
+# Gerar o Prisma Client
+npx prisma generate
+
+# Executar migrações
+npx prisma migrate dev
+
+# Popular o banco de dados (opcional)
+pnpm run seed
 ```
 
 #### 4. Executar a Aplicação
