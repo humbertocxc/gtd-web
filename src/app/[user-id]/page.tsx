@@ -25,21 +25,15 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status === "loading") return;
-
-    if (!session) {
-      router.push("/");
-      return;
+    if (status === "authenticated" && session) {
+      getUserData()
+        .then(setUserData)
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally(() => setLoading(false));
     }
-
-    getUserData()
-      .then(setUserData)
-      .catch((err) => {
-        console.error(err);
-        router.push("/");
-      })
-      .finally(() => setLoading(false));
-  }, [session, status, router, getUserData]);
+  }, [status, session, getUserData]);
 
   if (status === "loading" || loading) {
     return <div className="container mx-auto p-4">Carregando...</div>;

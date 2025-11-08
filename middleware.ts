@@ -1,14 +1,26 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
-const authMw = withAuth({
-  pages: {
-    signIn: "/",
+const authMw = withAuth(
+  function middleware(req) {
+    const token = req.nextauth.token;
+    const isAdminDashboard = req.nextUrl.pathname.startsWith("/admin-dashboard");
+
+    if (isAdminDashboard && token?.role !== "ADMIN") {
+      return NextResponse.redirect(new URL(`/${token?.id}`, req.url));
+    }
+
+    return NextResponse.next();
   },
-  callbacks: {
-    authorized: ({ token }) => !!token,
-  },
-});
+  {
+    pages: {
+      signIn: "/",
+    },
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
+  }
+);
 
 function noopMiddleware() {
   return NextResponse.next();
@@ -22,5 +34,8 @@ const exported = shouldUseNoop ? noopMiddleware : authMw;
 export default exported;
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: [
+    "/admin-dashboard/:path*",
+    "/((?!api|_next/static|_next/image|favicon.ico|login|signup|$).*)",
+  ],
 };

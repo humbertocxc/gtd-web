@@ -65,6 +65,9 @@ export const authOptions: NextAuthOptions = {
     signIn: "/",
   },
   callbacks: {
+    async signIn() {
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
@@ -78,6 +81,17 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+
+      if (url === baseUrl || url === `${baseUrl}/`) {
+        return baseUrl;
+      }
+
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+
+      if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

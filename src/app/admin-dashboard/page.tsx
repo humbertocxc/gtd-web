@@ -1,7 +1,6 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useUsers } from "@/lib/hooks/useUsers";
 import { useUserEdit } from "@/lib/hooks/useUserEdit";
@@ -12,7 +11,6 @@ import { Alert } from "@/components/Alert";
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
-  const router = useRouter();
   const {
     users,
     loading,
@@ -35,13 +33,10 @@ export default function AdminDashboard() {
   } = useUserSearchSort(users);
 
   useEffect(() => {
-    if (status === "loading") return;
-    if (!session || session.user.role !== "ADMIN") {
-      router.push("/");
-      return;
+    if (status === "authenticated" && session) {
+      fetchUsers();
     }
-    fetchUsers();
-  }, [session, status, router, fetchUsers]);
+  }, [status, session, fetchUsers]);
 
   const handleSaveEdit = async () => {
     if (!editingId || !editName) return;
@@ -59,14 +54,6 @@ export default function AdminDashboard() {
     return (
       <div className="flex justify-center items-center h-screen">
         Carregando...
-      </div>
-    );
-  }
-
-  if (!session || session.user.role !== "ADMIN") {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Acesso Negado
       </div>
     );
   }
