@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { registerUser } from "@/lib/services/auth-service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,8 +14,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -27,26 +25,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.create({
+    const authResponse = await registerUser({
+      name,
+      email,
+      password,
+    });
+
+    const { user, accessToken, refreshToken } = authResponse;
+
+    const tokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    const savedUser = await prisma.user.create({
       data: {
-        name,
-        email,
-        password: hashedPassword,
+        externalId: user.id,
+        name: user.name,
+        email: user.email,
         zipCode,
         bairro,
         city,
         state,
+        role: user.role || "USER",
+        accessToken,
+        refreshToken,
+        tokenExpiresAt,
       },
     });
 
     return NextResponse.json({
       message: "User created successfully",
-      user: { id: user.id, name: user.name, email: user.email },
+      user: { id: savedUser.id, name: savedUser.name, email: savedUser.email },
     });
   } catch (error) {
     console.error("Error creating user:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "User creation failed";
     return NextResponse.json(
-      { error: "User creation failed" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

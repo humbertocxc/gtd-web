@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { AddressData } from "@/lib/services/address/cep-service";
 import { CepField } from "./CepField";
-import { useApi } from "@/context/ApiProvider";
+import { registerUser } from "@/lib/services/auth-service";
 import { Alert } from "./Alert";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -35,7 +35,6 @@ export default function SignUpForm() {
     defaultValues: signUpDefaultValues,
   });
 
-  const { registerUser } = useApi();
   const router = useRouter();
 
   const handleAddressFetched = (addressData: AddressData | null) => {
@@ -51,7 +50,12 @@ export default function SignUpForm() {
     setAlert(null);
 
     try {
-      const result = await registerUser(data);
+      const result = await registerUser({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+
       setAlert({ message: "Usuário cadastrado com sucesso!", type: "success" });
       
       const user = result?.user;
@@ -66,9 +70,12 @@ export default function SignUpForm() {
       } else {
         setLoading(false);
       }
-    } catch {
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Falha no cadastro. Tente novamente.";
+
       setAlert({
-        message: "Falha no cadastro. Tente novamente.",
+        message: errorMessage,
         type: "error",
       });
       setLoading(false);

@@ -1,6 +1,8 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getServerSession } from "next-auth/next";
+import { loginUser, refreshUserToken } from "./services/auth-service";
+import { prisma } from "./prisma";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,48 +15,52 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials) {
-        const bcrypt = await import("bcryptjs");
-        const { prisma } = await import("./prisma");
-
         const email = credentials?.email as string;
         const password = credentials?.password as string;
+
         if (!email || !password) {
           return null;
         }
 
-        let user;
         try {
-          user = await prisma.user.findUnique({
-            where: { email },
-            select: {
-              id: true,
-              email: true,
-              name: true,
-              role: true,
-              password: true,
+          const authResponse = await loginUser({ email, password });
+          const { user, accessToken, refreshToken } = authResponse;
+
+          const tokenExpiresAt = new Date(
+            Date.now() + 15 * 60 * 1000
+          );
+
+          await prisma.user.upsert({
+            where: { externalId: user.id },
+            create: {
+              externalId: user.id,
+              email: user.email,
+              name: user.name,
+              role: user.role || "USER",
+              accessToken,
+              refreshToken,
+              tokenExpiresAt,
+            },
+            update: {
+              email: user.email,
+              name: user.name,
+              role: user.role || "USER",
+              accessToken,
+              refreshToken,
+              tokenExpiresAt,
             },
           });
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role || "USER",
+          };
         } catch (error) {
-          console.error("Database query failed:", error);
-          throw new Error("Internal server error. Please try again later.");
-        }
-
-        if (!user) {
+          console.error("Login failed:", error);
           return null;
         }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
       },
     }),
   ],
@@ -62,28 +68,95 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   pages: {
-    signIn: "/",
+    signIn: "/login",
   },
   callbacks: {
+    async jwt({ token, user, trigger }) {
+      if (user && trigger === "signIn") {
+        const typedUser = user as {
+          id: string;
+          email: string;
+          name: string;
+          role: string;
+        };
+
+        token.externalId = typedUser.id;
+        token.email = typedUser.email;
+        token.name = typedUser.name;
+        token.role = typedUser.role;
+
+        return token;
+      }
+
+      if (token.externalId) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { externalId: token.externalId as string },
+          });
+
+          if (!dbUser) {
+            console.error("User not found in database");
+            return { ...token, error: "UserNotFound" };
+          }
+
+          const now = new Date();
+          const isTokenValid = dbUser.tokenExpiresAt > now;
+
+          if (isTokenValid) {
+            token.accessToken = dbUser.accessToken;
+            return token;
+          } else {
+            try {
+              const refreshResponse = await refreshUserToken(
+                dbUser.refreshToken
+              );
+
+              await prisma.user.update({
+                where: { externalId: token.externalId as string },
+                data: {
+                  accessToken: refreshResponse.accessToken,
+                  refreshToken: refreshResponse.refreshToken,
+                  tokenExpiresAt: new Date(refreshResponse.expiresAt * 1000),
+                },
+              });
+
+              token.accessToken = refreshResponse.accessToken;
+              return token;
+            } catch (refreshError) {
+              console.error("Token refresh failed:", refreshError);
+              return { ...token, error: "RefreshTokenExpired" };
+            }
+          }
+        } catch (error) {
+          console.error("JWT callback error:", error);
+          return { ...token, error: "JWTCallbackError" };
+        }
+      }
+
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (token.error) {
+        return { ...session, error: token.error as string };
+      }
+
+      if (session.user) {
+        session.user.id = token.externalId as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        session.user.role = token.role as string;
+        session.accessToken = token.accessToken as string;
+      }
+
+      return session;
+    },
+
     async signIn() {
       return true;
     },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-      }
-      return session;
-    },
-    async redirect({ url, baseUrl }) {
 
+    async redirect({ url, baseUrl }) {
       if (url === baseUrl || url === `${baseUrl}/`) {
         return baseUrl;
       }

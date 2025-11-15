@@ -18,6 +18,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { signIn } from "next-auth/react";
 import { Alert } from "@/components/Alert";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -25,6 +26,8 @@ export default function LoginForm() {
     message: string;
     type?: "success" | "error" | "info";
   } | null>(null);
+
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -37,7 +40,7 @@ export default function LoginForm() {
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     setLoading(true);
     setAlert(null);
-    
+
     try {
       const result = await signIn("credentials", {
         email: data.email,
@@ -47,7 +50,7 @@ export default function LoginForm() {
 
       if (result?.error) {
         setAlert({
-          message: "Credenciais inválidas. Por favor, tente novamente.",
+          message: "Email ou senha inválidos. Por favor, tente novamente.",
           type: "error",
         });
         setLoading(false);
@@ -57,7 +60,7 @@ export default function LoginForm() {
           type: "success",
         });
         setTimeout(() => {
-          window.location.href = "/";
+          router.push("/admin-dashboard");
         }, 500);
       }
     } catch {
