@@ -11,10 +11,6 @@ interface UserData {
   id: string;
   name: string;
   email: string;
-  zipCode?: string;
-  bairro?: string;
-  city?: string;
-  state?: string;
 }
 
 export default function DashboardPage() {
@@ -67,18 +63,6 @@ export default function DashboardPage() {
             </p>
             <p>
               <strong>Nome:</strong> {userData.name}
-            </p>
-            <p>
-              <strong>CEP:</strong> {userData.zipCode || "Não informado"}
-            </p>
-            <p>
-              <strong>Bairro:</strong> {userData.bairro || "Não informado"}
-            </p>
-            <p>
-              <strong>Cidade:</strong> {userData.city || "Não informado"}
-            </p>
-            <p>
-              <strong>Estado:</strong> {userData.state || "Não informado"}
             </p>
           </div>
         </CardContent>

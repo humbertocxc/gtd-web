@@ -16,10 +16,6 @@ model User {
   email            String   @unique
   name             String
   password         String?
-  zipCode          String?
-  bairro           String?
-  city             String?
-  state            String?
   role             String   @default("USER")
   accessToken      String
   refreshToken     String

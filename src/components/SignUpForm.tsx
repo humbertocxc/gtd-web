@@ -16,8 +16,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
-import { AddressData } from "@/lib/services/address/cep-service";
-import { CepField } from "./CepField";
 import { registerUser } from "@/lib/services/auth-service";
 import { Alert } from "./Alert";
 import { useRouter } from "next/navigation";
@@ -36,14 +34,6 @@ export default function SignUpForm() {
   });
 
   const router = useRouter();
-
-  const handleAddressFetched = (addressData: AddressData | null) => {
-    if (addressData) {
-      form.setValue("bairro", addressData.bairro);
-      form.setValue("city", addressData.city);
-      form.setValue("state", addressData.state);
-    }
-  };
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     setLoading(true);
@@ -89,7 +79,7 @@ export default function SignUpForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+          className="grid grid-cols-1 gap-4"
         >
           <div className="space-y-4">
             <FormField
@@ -143,51 +133,6 @@ export default function SignUpForm() {
                       {...field}
                       disabled={loading}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="space-y-4">
-            <CepField
-              control={form.control}
-              onAddressFetched={handleAddressFetched}
-            />
-            <FormField
-              control={form.control}
-              name="state"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Estado</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Seu estado" {...field} disabled={loading} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cidade</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Sua cidade" {...field} disabled={loading} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="bairro"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bairro</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Seu bairro" {...field} disabled={loading} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

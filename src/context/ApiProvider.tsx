@@ -8,10 +8,6 @@ interface SignUpData {
   email: string;
   password: string;
   confirmPassword: string;
-  zipCode?: string;
-  bairro?: string;
-  city?: string;
-  state?: string;
 }
 
 interface RegisterResponse {
@@ -27,10 +23,6 @@ interface UserData {
   id: string;
   name: string;
   email: string;
-  zipCode?: string;
-  bairro?: string;
-  city?: string;
-  state?: string;
 }
 
 interface ApiContextType {

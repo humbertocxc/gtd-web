@@ -4,7 +4,7 @@ import { registerUser } from "@/lib/services/auth-service";
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password, zipCode, bairro, city, state } =
+    const { name, email, password } =
       await request.json();
 
     if (!name || !email || !password) {
@@ -40,10 +40,6 @@ export async function POST(request: NextRequest) {
         externalId: user.id,
         name: user.name,
         email: user.email,
-        zipCode,
-        bairro,
-        city,
-        state,
         role: user.role || "USER",
         accessToken,
         refreshToken,

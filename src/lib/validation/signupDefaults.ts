@@ -3,8 +3,4 @@ export const signUpDefaultValues = {
   email: "",
   password: "",
   confirmPassword: "",
-  zipCode: "",
-  bairro: "",
-  city: "",
-  state: "",
 };

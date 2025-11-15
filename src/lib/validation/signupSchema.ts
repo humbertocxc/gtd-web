@@ -12,14 +12,6 @@ export const signUpSchema = z
         "A senha deve incluir pelo menos uma letra maiúscula, um número e um caractere especial"
       ),
     confirmPassword: z.string().min(10, "Confirmação de senha é obrigatória"),
-    zipCode: z
-      .string()
-      .transform((val) => val.replace(/\D/g, ""))
-      .pipe(z.string().length(8, "CEP deve ter 8 dígitos"))
-      .optional(),
-    bairro: z.string().optional(),
-    city: z.string().optional(),
-    state: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
