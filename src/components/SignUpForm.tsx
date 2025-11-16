@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
-import { registerUser } from "@/lib/services/auth-service";
+import { registerUserAction } from "@/lib/actions/auth-actions";
 import { Alert } from "./Alert";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -40,29 +40,33 @@ export default function SignUpForm() {
     setAlert(null);
 
     try {
-      const result = await registerUser({
+      const result = await registerUserAction({
         name: data.name,
         email: data.email,
         password: data.password,
       });
 
-      setAlert({ message: "Usuário cadastrado com sucesso!", type: "success" });
-      
-      const user = result?.user;
-      if (user) {
-        try {
-          localStorage.setItem("user", JSON.stringify(user));
-        } catch {}
-        
+      if (result.success) {
+        setAlert({
+          message: result.message || "Usuário cadastrado com sucesso!",
+          type: "success",
+        });
+
         setTimeout(() => {
-          router.push("/");
+          router.push("/dashboard");
         }, 1000);
       } else {
+        setAlert({
+          message: result.error || "Falha no cadastro. Tente novamente.",
+          type: "error",
+        });
         setLoading(false);
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Falha no cadastro. Tente novamente.";
+        error instanceof Error
+          ? error.message
+          : "Falha no cadastro. Tente novamente.";
 
       setAlert({
         message: errorMessage,
@@ -89,7 +93,11 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormLabel>Nome</FormLabel>
                   <FormControl>
-                    <Input placeholder="Seu nome" {...field} disabled={loading} />
+                    <Input
+                      placeholder="Seu nome"
+                      {...field}
+                      disabled={loading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -102,7 +110,11 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormLabel>E-mail</FormLabel>
                   <FormControl>
-                    <Input placeholder="Seu e-mail" {...field} disabled={loading} />
+                    <Input
+                      placeholder="Seu e-mail"
+                      {...field}
+                      disabled={loading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -115,7 +127,11 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormLabel>Senha</FormLabel>
                   <FormControl>
-                    <PasswordInput placeholder="Sua senha" {...field} disabled={loading} />
+                    <PasswordInput
+                      placeholder="Sua senha"
+                      {...field}
+                      disabled={loading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

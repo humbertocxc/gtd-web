@@ -26,10 +26,8 @@ export default function Home() {
       return;
     }
 
-    const userId = session?.user?.id;
-
-    if (userId) {
-      router.replace(`/${userId}`);
+    if (session?.user) {
+      router.replace("/dashboard");
     }
   }, [session, status, router]);
 
