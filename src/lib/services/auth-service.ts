@@ -52,15 +52,15 @@ export async function registerUser(
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    
+
     if (response.status === 409) {
       throw new Error("Email already registered");
     }
-    
+
     if (response.status === 400) {
       throw new Error(errorData.message || "Invalid registration data");
     }
-    
+
     throw new Error(
       errorData.message || "Registration failed. Please try again."
     );
@@ -69,9 +69,7 @@ export async function registerUser(
   return response.json();
 }
 
-export async function loginUser(
-  data: LoginUserData
-): Promise<AuthResponse> {
+export async function loginUser(data: LoginUserData): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
     headers: {
@@ -117,9 +115,7 @@ export async function refreshAccessToken(
   return response.json();
 }
 
-export async function verifyToken(
-  accessToken: string
-): Promise<AuthUser> {
+export async function verifyToken(accessToken: string): Promise<AuthUser> {
   const response = await fetch(`${API_BASE_URL}/auth/verify`, {
     method: "GET",
     headers: {
@@ -162,8 +158,7 @@ export async function refreshUserToken(
   }
 
   const data = await response.json();
-  
-  // Calculate expiration time (15 minutes from now)
+
   const FIFTEEN_MINUTES_IN_SECONDS = 900;
   const expiresAt = Math.floor(Date.now() / 1000) + FIFTEEN_MINUTES_IN_SECONDS;
 
@@ -171,4 +166,29 @@ export async function refreshUserToken(
     ...data,
     expiresAt,
   };
+}
+
+export async function getUserProfile(accessToken: string): Promise<AuthUser> {
+  const response = await fetch(`${API_BASE_URL}/user/profile`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Unauthorized: Invalid or expired token");
+    }
+
+    if (response.status === 404) {
+      throw new Error("User profile not found");
+    }
+
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || "Failed to fetch user profile");
+  }
+
+  return response.json();
 }
