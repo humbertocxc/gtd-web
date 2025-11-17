@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { LogoutButton } from "@/components/LogoutButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,10 +29,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <div className="fixed top-4 right-4 z-50 flex gap-2">
-            <LogoutButton />
-            <ThemeToggle />
-          </div>
           {children}
         </Providers>
       </body>

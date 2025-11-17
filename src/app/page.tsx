@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const LoginForm = dynamic(() => import("@/components/LoginForm"), {
   ssr: false,
@@ -47,9 +48,12 @@ export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <div className="w-full max-w-4xl mx-auto px-4">
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">
-            Sistema de gerenciamento de usuários
+            Sistema GTD
           </h1>
           <div className="flex justify-center space-x-4 mb-6">
             <Button
