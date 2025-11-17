@@ -60,7 +60,7 @@ export default function LoginForm() {
           type: "success",
         });
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/gtd");
         }, 500);
       }
     } catch {

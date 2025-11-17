@@ -53,7 +53,7 @@ export default function SignUpForm() {
         });
 
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/gtd");
         }, 1000);
       } else {
         setAlert({

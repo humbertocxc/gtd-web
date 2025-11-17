@@ -28,7 +28,7 @@ export default function Home() {
     }
 
     if (session?.user) {
-      router.replace("/dashboard");
+      router.replace("/gtd");
     }
   }, [session, status, router]);
 
